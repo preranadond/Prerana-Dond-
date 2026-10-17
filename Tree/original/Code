@@ -1,0 +1,107 @@
+#include <iostream>
+using namespace std;
+struct Node {
+    int data;
+    Node *left, *right;
+    bool; 
+    bool rthread; 
+};
+Node* insert(Node* root, int key) {
+    Node* tmp = new Node();
+    tmp->data = key;
+    tmp->left = nullptr;
+    tmp->right = nullptr;
+    tmp->lthread = true; 
+    tmp->rthread = true;
+
+    if (root == nullptr) {
+        root = tmp;
+        return root;
+    }
+
+    Node* ptr = root;
+    Node* parent = nullptr;
+
+    while (ptr != nullptr) {
+        if (key == ptr->data) {
+            cout << "Duplicate key " << key << " ignored.\n";
+            delete tmp; 
+            return root;
+        }
+
+        parent = ptr; 
+
+        if (key < ptr->data) {
+            if (!ptr->lthread) {
+                ptr = ptr->left;
+            } else {
+                break;
+            }
+        } else {
+            if (!ptr->rthread) {
+                ptr = ptr->right;
+            } else {
+                break;
+            }
+        }
+    }
+    if (key < parent->data) {
+       
+        tmp->left = parent->left;   
+        tmp->right = parent;        
+        parent->lthread = false;   
+        parent->left = tmp;       
+    } else {
+     
+        tmp->left = parent;        
+        tmp->right = parent->right; 
+        parent->rthread = false;    
+        parent->right = tmp;     
+    }
+
+    return root;
+}
+
+Node* inorderSuccessor(Node* ptr) {
+    if (ptr->rthread) {
+        return ptr->right;
+    }
+    ptr = ptr->right;
+    while (!ptr->lthread) {
+        ptr = ptr->left;
+    }
+    return ptr;
+}
+
+void printInorder(Node* root) {
+    if (root == nullptr) {
+        cout << "Tree is empty.\n";
+        return;
+    }
+    Node* ptr = root;
+    while (!ptr->lthread) {
+        ptr = ptr->left;
+    }
+
+    while (ptr != nullptr) {
+        cout << ptr->data << " ";
+        ptr = inorderSuccessor(ptr);
+        cout << "\n";
+}
+
+int main() {
+    Node* root = nullptr;
+
+    root = insert(root, 20);
+    root = insert(root, 10);
+    root = insert(root, 30);
+    root = insert(root, 5);
+    root = insert(root, 15);
+    root = insert(root, 25);
+    root = insert(root, 35);
+
+    cout << "Inorder Traversal of the Threaded BST: ";
+    printInorder(root);
+
+    return 0;
+}
