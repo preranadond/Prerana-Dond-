@@ -1,135 +1,90 @@
 Original: 
-graph TD
-    %% Main Architecture Style
-    classDef main fill:#f9f,stroke:#333,stroke-width:2px;
-    classDef process fill:#e1f5fe,stroke:#0288d1,stroke-width:1px;
-    classDef condition fill:#fff9c4,stroke:#fbc02d,stroke-width:1px;
-    classDef finish fill:#c8e6c9,stroke:#388e3c,stroke-width:2px;
+Algorithm
+Collaborative Digital Art Layer Manager (Doubly Linked List)
+Each layer is a node with: layerId, layerName, isActive, prev, next. head = bottom layer, tail = top layer.
+1. Insert at Bottom (Head)
+Step 1: Create a new node with the given ID and name; isActive = true.
+Step 2: If head is NULL, set head = tail = new node.
+Step 3: Otherwise, set new node's next = head and head's prev = new node.
+Step 4: Set head = new node.
+Step 5: Stop.
+2. Insert at Top (Tail)
+Step 1: Create a new node with the given ID and name; isActive = true.
+Step 2: If tail is NULL, set head = tail = new node.
+Step 3: Otherwise, set tail's next = new node and new node's prev = tail.
+Step 4: Set tail = new node.
+Step 5: Stop.
+3. Set Layer Status (Active / Inactive)
+Step 1: Set temp = head.
+Step 2: Repeat while temp is not NULL:
+If temp's layerId = id, set isActive = status, display message and stop.
+Otherwise, move temp = temp's next.
+Step 3: If not found, display "Layer not found".
+Step 4: Stop.
+4. Delete Inactive Layers
+Step 1: If head is NULL, display "Canvas is empty" and stop.
+Step 2: Set current = head and count = 0.
+Step 3: Repeat while current is not NULL:
+Save nextNode = current's next.
+If current is inactive:
+(a) If current = head: set head = current's next; if head exists, head's prev = NULL.
+(b) Else if current = tail: set tail = current's prev; if tail exists, tail's next = NULL.
+(c) Else: current's prev → next = current's next, and current's next → prev = current's prev.
+Delete current and increase count by 1.
+Set current = nextNode.
+Step 4: If head is NULL, set tail = NULL.
+Step 5: Display count and stop.
+5. Shift Layer Up (Swap with Next Layer)
+Step 1: If the list is empty or has only one node, stop.
+Step 2: Search for the node 'current' with layerId = id by traversing from head.
+Step 3: If not found, display error and stop.
+Step 4: If current = tail, display "Already at top" and stop.
+Step 5: Set targetNext = current's next, beforeCurrent = current's prev, afterTarget = targetNext's next.
+Step 6: If beforeCurrent exists, set its next = targetNext; else set head = targetNext.
+Step 7: If afterTarget exists, set its prev = current; else set tail = current.
+Step 8: Set targetNext's prev = beforeCurrent and targetNext's next = current.
+Step 9: Set current's prev = targetNext and current's next = afterTarget.
+Step 10: Display success message and stop.
+6. Render Canvas (Bottom to Top)
+Step 1: If head is NULL, display "Canvas is empty" and stop.
+Step 2: Set temp = head and index = 0.
+Step 3: Repeat while temp is not NULL: display index, layerId, layerName and status; increase index; set temp = temp's next.
+Step 4: Display "Render complete" and stop.
+7. Main Program
+Step 1: Create the manager object and insert the three sample layers at the top.
+Step 2: Display the menu (1–7) and read choice.
+Step 3: If choice = 7, exit the program.
+Step 4: Otherwise, perform the matching operation:
+1 → Insert at Top, 2 → Insert at Bottom, 3 → Set Status, 4 → Delete Inactive, 5 → Shift Up, 6 → Render Canvas; any other → show invalid message.
+Step 5: Go back to Step 2.
 
-    %% 1. Insert at Bottom
-    subgraph S1 [1. Insert at Bottom Head]
-        A1[Create New Node: active=true] --> B1{Is Head NULL?}
-        B1 -- Yes --> C1[head = tail = new node]
-        B1 -- No --> D1[new node.next = head<br>head.prev = new node]
-        D1 --> E1[head = new node]
-        C1 --> F1([Stop])
-        E1 --> F1
-    end
+ Modified:  
+. Layer Representation (Node Structure)
 
-    %% 2. Insert at Top
-    subgraph S2 [2. Insert at Top Tail]
-        A2[Create New Node: active=true] --> B2{Is Tail NULL?}
-        B2 -- Yes --> C2[head = tail = new node]
-        B2 -- No --> D2[tail.next = new node<br>new node.prev = tail]
-        D2 --> E2[tail = new node]
-        C2 --> F2([Stop])
-        E2 --> F2
-    end
+Each node contains:
+• layerID (Integer)
+• name (String)
+• isVisible (Boolean)
+• next (Pointer to the next layer above)
+• prev (Pointer to the previous layer below)
+2. Core Operational Steps
 
-    %% 3. Set Layer Status
-    subgraph S3 [3. Set Layer Status]
-        A3[temp = head] --> B3{temp != NULL?}
-        B3 -- Yes --> C3{temp.layerId == id?}
-        C3 -- Yes --> D3[temp.isActive = status<br>Display Success] --> E3([Stop])
-        C3 -- No --> F3[temp = temp.next] --> B3
-        B3 -- No --> G3[Display 'Layer not found'] --> E3
-    end
-
-    %% 4. Delete Inactive Layers
-    subgraph S4 [4. Delete Inactive Layers]
-        A4{head == NULL?} -- Yes --> B4[Display 'Canvas is empty'] --> C4([Stop])
-        A4 -- No --> D4[current = head<br>count = 0]
-        D4 --> E4{current != NULL?}
-        E4 -- Yes --> F4[nextNode = current.next]
-        F4 --> G4{current.isActive == false?}
-        G4 -- Yes --> H4{Check Current Position}
-        H4 -- current == head --> I4[head = current.next<br>if head exists, head.prev = NULL]
-        H4 -- current == tail --> J4[tail = current.prev<br>if tail exists, tail.next = NULL]
-        H4 -- Else --> K4[current.prev.next = current.next<br>current.next.prev = current.prev]
-        I4 --> L4[Delete current<br>count++<br>current = nextNode]
-        J4 --> L4
-        K4 --> L4
-        L4 --> E4
-        G4 -- No --> M4[current = nextNode] --> E4
-        E4 -- No --> N4{head == NULL?}
-        N4 -- Yes --> O4[tail = NULL] --> P4[Display count] --> C4
-        N4 -- No --> P4
-    end
-
-    %% 5. Shift Layer Up
-    subgraph S5 [5. Shift Layer Up]
-        A5{List Empty or size == 1?} -- Yes --> B5([Stop])
-        A5 -- No --> C5[Traverse from head for node 'current']
-        C5 --> D5{Found?}
-        D5 -- No --> E5[Display Error] --> B5
-        D5 -- Yes --> F5{current == tail?}
-        F5 -- Yes --> G5[Display 'Already at top'] --> B5
-        F5 -- No --> H5["Set pointers:<br>targetNext = current.next<br>beforeCurrent = current.prev<br>afterTarget = targetNext.next"]
-        H5 --> I5{beforeCurrent exists?}
-        I5 -- Yes --> J5[beforeCurrent.next = targetNext]
-        I5 -- No --> K5[head = targetNext]
-        J5 --> L5{afterTarget exists?}
-        K5 --> L5
-        L5 -- Yes --> M5[afterTarget.prev = current]
-        L5 -- No --> N5[tail = current]
-        M5 --> O5["Update linkages:<br>targetNext.prev = beforeCurrent<br>targetNext.next = current<br>current.prev = targetNext<br>current.next = afterTarget"]
-        N5 --> O5
-        O5 --> P5[Display Success] --> B5
-    end
-
-    %% 6. Render Canvas
-    subgraph S6 [6. Render Canvas]
-        A6{head == NULL?} -- Yes --> B6[Display 'Canvas is empty'] --> C6([Stop])
-        A6 -- No --> D6[temp = head<br>index = 0]
-        D6 --> E6{temp != NULL?}
-        E6 -- Yes --> F6[Display current layer specs<br>index++<br>temp = temp.next] --> E6
-        E6 -- No --> G6[Display 'Render complete'] --> C6
-    end
-
-    %% Apply Classes
-    class F1,F2,E3,C4,B5,C6 finish;
-    class B1,B2,B3,C3,A4,E4,G4,N4,A5,D5,F5,I5,L5,A6,E6 condition;
-
-    Modified:  
-    graph TD
-    classDef finish fill:#c8e6c9,stroke:#388e3c,stroke-width:2px;
-    classDef condition fill:#fff9c4,stroke:#fbc02d,stroke-width:1px;
-
-    %% Insertion Block
-    subgraph Insertion [Core Step: Insertion at Top Head]
-        A1[Create new node N] --> B1{Is head NULL?}
-        B1 -- Yes --> C1["N.next = N<br>N.prev = N<br>head = N"]
-        B1 -- No --> D1[Find tail: tail = head.prev]
-        D1 --> E1["N.next = head<br>N.prev = tail"]
-        E1 --> F1["tail.next = N<br>head.prev = N"]
-        F1 --> G1[head = N]
-        C1 --> H1([Stop])
-        G1 --> H1
-    end
-
-    %% Deletion Block
-    subgraph Deletion [Core Step: Deletion of a Layer]
-        A2{Is head NULL?} -- Yes --> B2([Return])
-        A2 -- No --> C2[Locate target node T]
-        C2 --> D2{Is T the only node?}
-        D2 -- Yes --> E2[head = NULL] --> F2[Deallocate memory for T]
-        D2 -- No --> G2["T.prev.next = T.next<br>T.next.prev = T.prev"]
-        G2 --> H2{Does T == head?}
-        H2 -- Yes --> I2[head = T.next] --> F2
-        H2 -- No --> F2
-        F2 --> J2([Stop])
-    end
-
-    %% Forward Traversal
-    subgraph Traversal [Core Step: Forward Traversal Render]
-        A3{Is head NULL?} -- Yes --> B3([Stop])
-        A3 -- No --> C3[Start at current = head]
-        C3 --> D3[Print / Process current node details]
-        D3 --> E3[Move current = current.next]
-        E3 --> F3{Does current == head?}
-        F3 -- No --> D3
-        F3 -- Yes --> G3([Stop Render])
-    end
-
-    class H1,J2,B3,G3 finish;
-    class B1,A2,D2,H2,A3,F3 condition;
+• Initialization: Set head = NULL.
+• Insertion at Top (Head):
+	1. Create a new node N.
+	2. If head is NULL, point N's next and prev to itself, then set head = N.
+	3. If head exists, find the last node (tail = head->prev).
+	4. Set N → next = head, N → prev = tail.
+	5. Update tail → next = N and head → prev = N.
+	6. Update head = N.
+• Deletion of a Layer:
+	1. If the list is empty, return.
+	2. Locate the target node T. If it's the only node, set head = NULL.
+	3. Otherwise, set T → prev → next = T → next.
+	4. Set T → next → prev = T → prev.
+	5. If T == head, move head to T → next.
+	6. Deallocate memory for T.
+• Forward Traversal (Render Canvas):
+	1. Start at head.
+	2. Loop, printing/processing each node's details.
+	3. Move to current->next. Stop when current == head again.
