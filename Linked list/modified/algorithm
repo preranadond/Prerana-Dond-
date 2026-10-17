@@ -1,0 +1,32 @@
+•Alogorithm
+
+1.Each node contains:
+• layerID (Integer)
+• name (String)
+• isVisible (Boolean)
+• next (Pointer to the next layer above)
+• prev (Pointer to the previous layer below)
+
+2. Core Operational Steps
+
+• Initialization: Set head = NULL.
+• Insertion at Top (Head):
+	1. Create a new node N.
+	2. If head is NULL, point N's next and prev to itself, then set head = N.
+	3. If head exists, find the last node (tail = head->prev).
+	4. Set N → next = head, N → prev = tail.
+	5. Update tail → next = N and head → prev = N.
+	6. Update head = N.
+• Deletion of a Layer:
+	1. If the list is empty, return.
+	2. Locate the target node T. If it's the only node, set head = NULL.
+	3. Otherwise, set T → prev → next = T → next.
+	4. Set T → next → prev = T → prev.
+	5. If T == head, move head to T → next.
+	6. Deallocate memory for T.
+• Forward Traversal (Render Canvas):
+	1. Start at head.
+	2. Loop, printing/processing each node's details.
+	3. Move to current->next. Stop when current == head again.
+
+🗺️
