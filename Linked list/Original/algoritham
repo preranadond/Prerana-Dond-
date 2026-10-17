@@ -1,0 +1,35 @@
+Algorithm: Doubly Linked List for Managing Layers
+1.Start.
+2.Create an empty doubly linked list by setting HEAD = NULL and TAIL = NULL.
+3.Display the menu:
+•Insert layer at the top.
+•Insert layer at the bottom.
+•Delete inactive layer.
+•Reorder layer.
+•Display layers.
+•Exit.
+4.Read the user's choice.
+5.If the user selects Insert Layer at Top:
+•Create a new layer node.
+•Set its next pointer to HEAD.
+•Set its prev pointer to NULL.
+•Update HEAD and, if required, TAIL.
+•If the user selects Insert Layer at Bottom:
+•Create a new layer node.
+•Set its prev pointer to TAIL.
+•Set its next pointer to NULL.
+•Update TAIL and, if required, HEAD.
+7.If the user selects Delete Inactive Layer: 
+•Search for the inactive layer.
+•Adjust the prev and next pointers of the neighbouring nodes.
+•Update HEAD and TAIL if required.
+•Delete the selected node.
+8.If the user selects Reorder Layer:
+•Find the required layer.
+•Remove it from its current position.
+•Insert it at the new position by updating the pointers.
+9.If the user selects Display Layers:
+•Traverse the list from HEAD to TAIL.
+•Display all layers sequentially to represent the final canvas.
+10.Repeat steps 3–9 until the user selects Exit.
+11.Stop.
