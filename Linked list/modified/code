@@ -1,0 +1,208 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <queue>
+#include <algorithm>
+
+using namespace std;
+
+struct LayerNode {
+    int layerId;
+    string layerName;
+    bool isActive;
+
+    LayerNode(int id, string name) {
+        layerId = id;
+        layerName = name;
+        isActive = true; 
+    }
+};
+
+class DigitalArtCanvasManager {
+private:
+    via vector: Index 0 is absolute BOTTOM (Background), back() is absolute TOP (Foreground)
+    vector<LayerNode*> layerStack; 
+    
+    queue<LayerNode*> trashDeallocationQueue;
+
+public:
+    ~DigitalArtCanvasManager() {
+    
+        for (auto layer : layerStack) {
+            delete layer;
+        }
+      
+        while (!trashDeallocationQueue.empty()) {
+            delete trashDeallocationQueue.front();
+            trashDeallocationQueue.pop();
+        }
+    }
+
+    void insertAtTop(int id, string name) {
+        LayerNode* newLayer = new LayerNode(id, name);
+        layerStack.push_back(newLayer); 
+        cout << ">> Success: Layer [" << name << "] pushed to the absolute TOP (Foreground Stack).\n";
+    }
+
+    void insertAtBottom(int id, string name) {
+        LayerNode* newLayer = new LayerNode(id, name);
+        layerStack.insert(layerStack.begin(), newLayer); 
+        cout << ">> Success: Layer [" << name << "] inserted at the absolute BOTTOM (Background Base).\n";
+    }
+
+    void toggleLayerStatus(int id, bool status) {
+        for (auto layer : layerStack) {
+            if (layer->layerId == id) {
+                layer->isActive = status;
+                cout << ">> Layer ID " << id << " status updated to: " << (status ? "ACTIVE" : "INACTIVE") << "\n";
+                return;
+            }
+        }
+        cout << ">> Error: Layer ID " << id << " not found.\n";
+    }
+
+    void deleteInactiveLayers() {
+        if (layerStack.empty()) {
+            cout << ">> Canvas Stack is completely empty.\n";
+            return;
+        }
+
+        vector<LayerNode*> activeLayers;
+        int movedToTrashCount = 0;
+
+        for (auto layer : layerStack) {
+            if (!layer->isActive) {
+                trashDeallocationQueue.push(layer); 
+                movedToTrashCount++;
+                cout << ">> Enqueuing Inactive Layer to Trash Queue: [" << layer->layerName << "]\n";
+            } else {
+                activeLayers.push_back(layer);
+            }
+        }
+
+        layerStack = move(activeLayers);
+        cout << ">> Total layers sent to Garbage Queue: " << movedToTrashCount << "\n";
+
+        int cleanCount = 0;
+        while (!trashDeallocationQueue.empty()) {
+            LayerNode* targetTrash = trashDeallocationQueue.front(); 
+            trashDeallocationQueue.pop();                           
+            
+            cout << ">> [FIFO Cleanup] Safely freeing heap memory for: [" << targetTrash->layerName << "]\n";
+            delete targetTrash;
+            cleanCount++;
+        }
+        cout << ">> Memory Garbage Queue successfully processed. Total freed nodes: " << cleanCount << "\n";
+    }
+
+    void shiftLayerUp(int id) {
+        if (layerStack.size() < 2) return; 
+
+        for (size_t i = 0; i < layerStack.size(); ++i) {
+            if (layerStack[i]->layerId == id) {
+                if (i == layerStack.size() - 1) {
+                    cout << ">> Notice: Layer is already at the absolute TOP stack limits.\n";
+                    return;
+                )
+
+                swap(layerStack[i], layerStack[i + 1]);
+                cout << ">> Reorder Success: Shifted Layer ID " << id << " up by 1 stack index depth.\n";
+                return;
+            }
+        }
+        cout << ">> Error: Target reorder Layer ID " << id << " not found.\n";
+    }
+
+   
+    void renderCanvas() {
+        if (layerStack.empty()) {
+            cout << "\n========================================\n";
+            cout << "       CANVAS STACK IS CURRENTLY EMPTY  \n";
+            cout << "========================================\n";
+            return;
+        }
+
+        cout << "\n========================================\n";
+        cout << "     SEQUENTIAL CANVAS RENDERING PIPELINE \n";
+        cout << "       (Stacking Context: Bottom -> Top)  \n";
+        cout << "========================================\n";
+        
+        
+        for (size_t i = 0; i < layerStack.size(); ++i) {
+            cout << " Layer Depth [" << i << "] -> ID: " << layerStack[i]->layerId 
+                 << " | Name: \"" << layerStack[i]->layerName << "\" | Status: " 
+                 << (layerStack[i]->isActive ? " [ACTIVE]" : " [INACTIVE - Muted]") << "\n";
+        }
+        cout << "----------------------------------------\n";
+        cout << ">> Render Complete: Final Stack output generated successfully.\n\n";
+    }
+};
+
+int main() {
+    DigitalArtCanvasManager editor;
+    int choice, id;
+    string name;
+    int statusChoice;
+
+    editor.insertAtTop(101, "Background Sketch Fill");
+    editor.insertAtTop(102, "Character Vector Lineart");
+    editor.insertAtTop(103, "Dynamic Light Overlay FX");
+
+    while (true) {
+        cout << "\n--- COLLABORATIVE DIGITAL ART LAYER MANAGER (STACK & QUEUE) ---\n";
+        cout << "1. Push New Layer to TOP (Foreground Stack)\n";
+        cout << "2. Insert New Layer at BOTTOM (Base Background)\n";
+        cout << "3. Toggle Layer Visibility (Active / Inactive Flags)\n";
+        cout << "4. Flush & Process Inactive Layers (Queue Deallocation)\n";
+        cout << "5. Reorder Layers (Shift Layer Upwards)\n";
+        cout << "6. Render Graphic Canvas (Bottom-to-Top Traversal)\n";
+        cout << "7. Close Editor & Exit Program\n";
+        cout << "Enter selection choice (1-7): ";
+        cin >> choice;
+
+        if (choice == 7) {
+            cout << "Exiting workspace. Goodbye!\n";
+            break;
+        }
+
+        switch (choice) {
+            case 1:
+                cout << "Enter unique layer ID (int): ";
+                cin >> id;
+                cout << "Enter friendly layer name: ";
+                cin.ignore();
+                getline(cin, name);
+                editor.insertAtTop(id, name);
+                break;
+            case 2:
+                cout << "Enter unique layer ID (int): ";
+                cin >> id;
+                cout << "Enter friendly layer name: ";
+                cin.ignore();
+                getline(cin, name);
+                editor.insertAtBottom(id, name);
+                break;
+            case 3:
+                cout << "Enter target layer ID to edit: ";
+                cin >> id;
+                cout << "Set structural layer state (1 = Active, 0 = Inactive): ";
+                cin >> statusChoice;
+                editor.toggleLayerStatus(id, (statusChoice == 1));
+                break;
+            case 4:
+                editor.deleteInactiveLayers();
+                break;
+            case 5:
+                cout << "Enter layer ID you want to shift up: ";
+                cin >> id;
+                editor.shiftLayerUp(id);
+                break;
+            case 6:
+                editor.renderCanvas();
+                break;
+            default:
+                cout << ">> Invalid input option!\n";
+        }
+    }
+    return 0;
+}
