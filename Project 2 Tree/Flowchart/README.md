@@ -32,7 +32,7 @@ graph TD
     AttachStep -- No --> AttachRight[tmp->left = parent<br>tmp->right = parent->right<br>parent->rthread = false<br>parent->right = tmp]
     AttachRight --> RetRoot3[Return root] --> End4([End])
 
-    Modified:
+ Modified:
     graph TD
     Start([Start]) --> CreateNode[Create Node 'tmp' with flags<br>lthread=true, rthread=true]
     CreateNode --> CheckRoot{Is root == nullptr?}
